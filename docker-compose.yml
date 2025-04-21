@@ -10,3 +10,8 @@ services:
     build: ./models/model-text2text
     ports:
       - "8503:8503"
+    volumes:
+      - huggingface_cache:/root/.cache/huggingface
+
+volumes:
+  huggingface_cache:

@@ -25,6 +25,8 @@ class TextRequest(BaseModel):
 def load_models():
     for name, hf_id in MODEL_REGISTRY.items():
         try:
+            logger.info(f"Начало загрузки модели '{name}' из {hf_id}...")
+
             tokenizer = AutoTokenizer.from_pretrained(hf_id)
             model = AutoModelForCausalLM.from_pretrained(hf_id)
             pipe = pipeline(
