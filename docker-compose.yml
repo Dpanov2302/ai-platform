@@ -1,0 +1,12 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - model-text2text
+
+  model-text2text:
+    build: ./models/model-text2text
+    ports:
+      - "8503:8503"
