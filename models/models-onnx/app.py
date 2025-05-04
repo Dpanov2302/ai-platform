@@ -6,8 +6,6 @@ import numpy as np
 import io
 import cv2
 import logging
-from pydantic import BaseModel
-import base64
 
 from coco_classes import COCO_CLASSES
 
@@ -48,10 +46,17 @@ async def classify_image(file: UploadFile = File(...)):
         img = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
         img = cv2.resize(img, (224, 224))
         img = img.astype(np.float32) / 255.0
-        img = np.transpose(img, (2, 0, 1))[np.newaxis, :]  # NCHW
-        input_name = sessions["efficientnet"].get_inputs()[0].name
+        img = img[np.newaxis, :]  # NHWC: (1, 224, 224, 3)
+
+        input_tensor = sessions["efficientnet"].get_inputs()[0]
+        print(f"INPUT NAME: {input_tensor.name}")
+        print(f"INPUT SHAPE: {input_tensor.shape}")
+        print(f"INPUT TYPE: {input_tensor.type}")
+
+        input_name = input_tensor.name
         output = sessions["efficientnet"].run(None, {input_name: img})[0]
         prediction = int(np.argmax(output))
+        logger.info(f"classify/prediction: {prediction}")
         return {"class_id": prediction}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка классификации: {e}")
