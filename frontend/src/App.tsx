@@ -8,6 +8,8 @@ import TextToImagePage from "./pages/model/TextToImagePage";
 import ImageToTextPage from "./pages/model/ImageToTextPage";
 import ImageToImagePage from "./pages/model/ImageToImagePage";
 import TextImageToImagePage from "./pages/model/TextImageToImagePage";
+import ImageDetectionPage from "@/pages/model/ImageDetectionPage.tsx";
+import ImageClassificationPage from "@/pages/model/ImageClassificationPage.tsx";
 
 const App = () => (
   <BrowserRouter>
@@ -19,6 +21,10 @@ const App = () => (
       <Route path="/model/image-to-text" element={<ImageToTextPage />} />
       <Route path="/model/image-to-image" element={<ImageToImagePage />} />
       <Route path="/model/text-image-to-image" element={<TextImageToImagePage />} />
+
+      <Route path="/model/image-detection" element={<ImageDetectionPage />} />
+      <Route path="/model/image-classification" element={<ImageClassificationPage />} />
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>

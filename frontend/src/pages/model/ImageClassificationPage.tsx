@@ -1,13 +1,18 @@
-import { useState, useEffect } from "react";
-import { Header } from "../../components/Header";
-import { Footer } from "../../components/Footer";
-import { Loader, Image as ImageIcon } from "lucide-react";
+import {useState, useEffect} from "react";
+import {Header} from "../../components/Header";
+import {Footer} from "../../components/Footer";
+import {Loader, Image as ImageIcon} from "lucide-react";
+import {BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell} from "recharts";
+
 
 const ImageClassificationPage = () => {
     const [image, setImage] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [result, setResult] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [top5Data, setTop5Data] = useState<
+        { name: string; probability: number }[]
+    >([]);
 
     useEffect(() => {
         if (!image) {
@@ -32,6 +37,7 @@ const ImageClassificationPage = () => {
         if (!image) return;
         setIsLoading(true);
         setResult(null);
+        setTop5Data([]);
 
         const formData = new FormData();
         formData.append("file", image);
@@ -47,7 +53,16 @@ const ImageClassificationPage = () => {
             }
 
             const data = await response.json();
-            setResult(`Класс ID: ${data.class_id}`);
+
+            const predictions = data.predictions.map(
+                (p: { class_id: number; class_name: string; probability: number }) => ({
+                    name: p.class_name,
+                    probability: +(p.probability * 100).toFixed(2),
+                })
+            );
+
+            setTop5Data(predictions);
+            setResult(`Топ 5 классов: ${predictions.map(p => `${p.name} (${p.probability}%)`).join(", ")}`);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 setResult(`Ошибка: ${error.message}`);
@@ -61,9 +76,10 @@ const ImageClassificationPage = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
-            <Header />
+            <Header/>
             <main className="max-w-4xl mx-auto px-4 py-24">
-                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                <div
+                    className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-6">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                         Модель: Классификация изображения
                     </h1>
@@ -82,7 +98,7 @@ const ImageClassificationPage = () => {
                             />
                             {image && (
                                 <div className="mt-2 flex items-center space-x-4">
-                                    <ImageIcon className="w-5 h-5 text-blue-400" />
+                                    <ImageIcon className="w-5 h-5 text-blue-400"/>
                                     <span className="text-gray-800 dark:text-gray-100 text-sm">{image.name}</span>
                                 </div>
                             )}
@@ -92,7 +108,8 @@ const ImageClassificationPage = () => {
                         {previewUrl && (
                             <div className="mt-4 animate-fadeIn">
                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Предпросмотр:</p>
-                                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-2 flex justify-center">
+                                <div
+                                    className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-2 flex justify-center">
                                     <img
                                         src={previewUrl}
                                         alt="Предпросмотр"
@@ -108,20 +125,44 @@ const ImageClassificationPage = () => {
                             disabled={isLoading || !image}
                             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-600"
                         >
-                            {isLoading ? (<><Loader className="mr-2 h-4 w-4 animate-spin" />Обработка...</>) : "Классифицировать"}
+                            {isLoading ? (<><Loader
+                                className="mr-2 h-4 w-4 animate-spin"/>Обработка...</>) : "Классифицировать"}
                         </button>
                     </form>
                     {result && (
                         <div className="mt-8 animate-fadeIn">
                             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Результат:</h2>
-                            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                            <div
+                                className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
                                 <pre className="whitespace-pre-wrap dark:text-gray-200">{result}</pre>
+                            </div>
+                        </div>
+                    )}
+                    {top5Data.length > 0 && (
+                        <div className="mt-8 animate-fadeIn">
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Диаграмма
+                                предсказаний</h2>
+                            <div
+                                className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                                <ResponsiveContainer width="100%" height={250}>
+                                    <BarChart data={top5Data} layout="vertical"
+                                              margin={{top: 10, right: 30, left: 60, bottom: 10}}>
+                                        <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`}/>
+                                        <YAxis type="category" dataKey="name" tick={{fill: '#8884d8'}}/>
+                                        <Tooltip formatter={(value: number) => `${value}%`}/>
+                                        <Bar dataKey="probability" fill="#3b82f6">
+                                            {top5Data.map((_, index) => (
+                                                <Cell key={`cell-${index}`}/>
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
                             </div>
                         </div>
                     )}
                 </div>
             </main>
-            <Footer />
+            <Footer/>
         </div>
     );
 };

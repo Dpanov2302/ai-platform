@@ -32,8 +32,8 @@ def load_models():
 @app.post("/classify")
 async def classify_image(file: UploadFile = File(...)):
     try:
-        prediction = await classify.predict(sessions["efficientnet"], file)
-        return {"class_id": prediction}
+        predictions = await classify.predict(sessions["efficientnet"], file)
+        return predictions
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
