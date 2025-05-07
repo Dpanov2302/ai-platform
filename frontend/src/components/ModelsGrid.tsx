@@ -14,13 +14,19 @@ const DEMO_MODELS = [
     id: "text-generation",
     title: "Генерация текста",
     description: "Создание текстового контента на основе промпта",
-    tags: ["GPT", "NLP"]
+    tags: ["NLP", "GPT"]
   },
   {
     id: "image-classification",
     title: "Классификация изображений", 
-    description: "Определение объектов на изображениях",
-    tags: ["Computer Vision", "CNN"]
+    description: "Распознавание объектов на изображениях",
+    tags: ["Computer Vision", "EfficientNet-Lite4"]
+  },
+  {
+    id: "image-detection",
+    title: "Детекция объектов",
+    description: "Определение границ объектов на изображениях",
+    tags: ["Computer Vision", "YOLOv5n"]
   },
   {
     id: "sentiment-analysis", 
