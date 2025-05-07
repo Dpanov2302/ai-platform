@@ -2,7 +2,7 @@ import {useState, useEffect} from "react";
 import {Header} from "../../components/Header";
 import {Footer} from "../../components/Footer";
 import {Loader, Image as ImageIcon} from "lucide-react";
-import {BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell} from "recharts";
+import {BarChart, PieChart, Bar, Pie, XAxis, YAxis, Legend, Tooltip, ResponsiveContainer, Cell} from "recharts";
 
 
 const ImageClassificationPage = () => {
@@ -13,6 +13,7 @@ const ImageClassificationPage = () => {
     const [top5Data, setTop5Data] = useState<
         { name: string; probability: number }[]
     >([]);
+    const [chartType, setChartType] = useState<"bar" | "pie">("bar");
 
     useEffect(() => {
         if (!image) {
@@ -74,6 +75,8 @@ const ImageClassificationPage = () => {
         }
     };
 
+    const pieColors = ["#3b82f6", "#6366f1", "#8b5cf6", "#ec4899", "#f59e0b"];
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
             <Header/>
@@ -81,7 +84,7 @@ const ImageClassificationPage = () => {
                 <div
                     className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-6">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                        Модель: Классификация изображения
+                        Модель: Классификация изображения (EfficientNet-Lite4)
                     </h1>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
@@ -129,33 +132,63 @@ const ImageClassificationPage = () => {
                                 className="mr-2 h-4 w-4 animate-spin"/>Обработка...</>) : "Классифицировать"}
                         </button>
                     </form>
-                    {result && (
-                        <div className="mt-8 animate-fadeIn">
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Результат:</h2>
-                            <div
-                                className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-                                <pre className="whitespace-pre-wrap dark:text-gray-200">{result}</pre>
-                            </div>
-                        </div>
-                    )}
+                    {/*{result && (*/}
+                    {/*    <div className="mt-8 animate-fadeIn">*/}
+                    {/*        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Результат:</h2>*/}
+                    {/*        <div*/}
+                    {/*            className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">*/}
+                    {/*            <pre className="whitespace-pre-wrap dark:text-gray-200">{result}</pre>*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
                     {top5Data.length > 0 && (
                         <div className="mt-8 animate-fadeIn">
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Диаграмма
-                                предсказаний</h2>
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-medium text-gray-900 dark:text-white">Диаграмма
+                                    предсказаний (Топ 5 классов)</h2>
+                                <button
+                                    onClick={() => setChartType(chartType === "bar" ? "pie" : "bar")}
+                                    className="text-sm text-blue-600 dark:text-blue-300 underline hover:no-underline"
+                                >
+                                    {chartType === "bar" ? "Переключиться на круговую" : "Переключиться на столбчатую"}
+                                </button>
+                            </div>
                             <div
                                 className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-                                <ResponsiveContainer width="100%" height={250}>
-                                    <BarChart data={top5Data} layout="vertical"
-                                              margin={{top: 10, right: 30, left: 60, bottom: 10}}>
-                                        <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`}/>
-                                        <YAxis type="category" dataKey="name" tick={{fill: '#8884d8'}}/>
-                                        <Tooltip formatter={(value: number) => `${value}%`}/>
-                                        <Bar dataKey="probability" fill="#3b82f6">
-                                            {top5Data.map((_, index) => (
-                                                <Cell key={`cell-${index}`}/>
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
+                                <ResponsiveContainer width="100%" height={300}>
+                                    {chartType === "bar" ? (
+                                        <BarChart data={top5Data} layout="vertical"
+                                                  margin={{top: 10, right: 30, left: 60, bottom: 10}}>
+                                            <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`}/>
+                                            <YAxis type="category" dataKey="name" tick={{fill: '#8884d8'}}/>
+                                            <Tooltip formatter={(value: number) => `${value}%`}/>
+                                            <Bar dataKey="probability" fill="#3b82f6">
+                                                {top5Data.map((_, index) => (
+                                                    <Cell key={`pie-${index}`}
+                                                          fill={pieColors[index % pieColors.length]}/>
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    ) : (
+                                        <PieChart>
+                                            <Pie
+                                                data={top5Data}
+                                                dataKey="probability"
+                                                nameKey="name"
+                                                cx="50%"
+                                                cy="50%"
+                                                outerRadius={100}
+                                                label={({name, probability}) => `${name}: ${probability.toFixed(1)}%`}
+                                            >
+                                                {top5Data.map((_, index) => (
+                                                    <Cell key={`pie-${index}`}
+                                                          fill={pieColors[index % pieColors.length]}/>
+                                                ))}
+                                            </Pie>
+                                            <Tooltip formatter={(value: number) => `${value}%`}/>
+                                            <Legend/>
+                                        </PieChart>
+                                    )}
                                 </ResponsiveContainer>
                             </div>
                         </div>
