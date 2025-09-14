@@ -2,7 +2,7 @@ import io
 import os
 
 import httpx
-from fastapi import FastAPI, HTTPException, File, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -24,6 +24,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ----- LIFESPAN -----
+
+
+@app.on_event("startup")
+async def startup() -> None:
+    app.state.client = httpx.AsyncClient()
+
+
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    await app.state.client.aclose()
+
+
+async def get_client() -> httpx.AsyncClient:
+    return app.state.client
+
 
 # ----- МОДЕЛИ ЗАПРОСОВ -----
 class TextRequest(BaseModel):
@@ -37,14 +53,17 @@ class TextToImageRequest(BaseModel):
 
 # ----- ROUTES -----
 
+
 @app.post("/generate-text")
-async def generate_text(req: TextRequest):
+async def generate_text(
+    req: TextRequest, client: httpx.AsyncClient = Depends(get_client)
+):
     try:
-        async with httpx.AsyncClient(timeout=120) as client:
-            response = await client.post(
-                "http://model-text2text:8503/generate",
-                json={"input_text": req.input_text},
-            )
+        response = await client.post(
+            "http://model-text2text:8503/generate",
+            json={"input_text": req.input_text},
+            timeout=120,
+        )
         response.raise_for_status()
         return response.json()
     except httpx.HTTPError as e:
@@ -52,11 +71,14 @@ async def generate_text(req: TextRequest):
 
 
 @app.post("/classify-image")
-async def classify_image(file: UploadFile = File(...)):
+async def classify_image(
+    file: UploadFile = File(...), client: httpx.AsyncClient = Depends(get_client)
+):
     try:
         files = {"file": (file.filename, await file.read(), file.content_type)}
-        async with httpx.AsyncClient(timeout=60) as client:
-            response = await client.post("http://models-onnx:8504/classify", files=files)
+        response = await client.post(
+            "http://models-onnx:8504/classify", files=files, timeout=60
+        )
         response.raise_for_status()
         return response.json()
     except httpx.HTTPError as e:
@@ -64,11 +86,14 @@ async def classify_image(file: UploadFile = File(...)):
 
 
 @app.post("/detect-image")
-async def detect_image(file: UploadFile = File(...)):
+async def detect_image(
+    file: UploadFile = File(...), client: httpx.AsyncClient = Depends(get_client)
+):
     try:
         files = {"file": (file.filename, await file.read(), file.content_type)}
-        async with httpx.AsyncClient(timeout=60) as client:
-            response = await client.post("http://models-onnx:8504/detect-image", files=files)
+        response = await client.post(
+            "http://models-onnx:8504/detect-image", files=files, timeout=60
+        )
         response.raise_for_status()
 
         return StreamingResponse(
