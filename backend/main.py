@@ -1,9 +1,10 @@
+import io
+
+import httpx
 from fastapi import FastAPI, HTTPException, File, UploadFile
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-import requests
-import io
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -29,45 +30,47 @@ class TextToImageRequest(BaseModel):
 # ----- ROUTES -----
 
 @app.post("/generate-text")
-def generate_text(req: TextRequest):
+async def generate_text(req: TextRequest):
     try:
-        response = requests.post(
-            "http://model-text2text:8503/generate",
-            json={"input_text": req.input_text},
-            timeout=120
-        )
+        async with httpx.AsyncClient(timeout=120) as client:
+            response = await client.post(
+                "http://model-text2text:8503/generate",
+                json={"input_text": req.input_text},
+            )
         response.raise_for_status()
         return response.json()
-    except Exception as e:
+    except httpx.HTTPError as e:
         raise HTTPException(status_code=500, detail=f"Ошибка text2text model: {e}")
 
 
 @app.post("/classify-image")
-def classify_image(file: UploadFile = File(...)):
+async def classify_image(file: UploadFile = File(...)):
     try:
-        files = {"file": (file.filename, file.file, file.content_type)}
-        response = requests.post("http://models-onnx:8504/classify", files=files)
+        files = {"file": (file.filename, await file.read(), file.content_type)}
+        async with httpx.AsyncClient(timeout=60) as client:
+            response = await client.post("http://models-onnx:8504/classify", files=files)
         response.raise_for_status()
         return response.json()
-    except Exception as e:
+    except httpx.HTTPError as e:
         raise HTTPException(status_code=500, detail=f"Ошибка ONNX classify: {e}")
 
 
 @app.post("/detect-image")
-def detect_image(file: UploadFile = File(...)):
+async def detect_image(file: UploadFile = File(...)):
     try:
-        files = {"file": (file.filename, file.file, file.content_type)}
-        response = requests.post("http://models-onnx:8504/detect-image", files=files)
+        files = {"file": (file.filename, await file.read(), file.content_type)}
+        async with httpx.AsyncClient(timeout=60) as client:
+            response = await client.post("http://models-onnx:8504/detect-image", files=files)
         response.raise_for_status()
 
         return StreamingResponse(
             io.BytesIO(response.content),
-            media_type=response.headers.get("Content-Type", "image/jpeg")
+            media_type=response.headers.get("Content-Type", "image/jpeg"),
         )
-    except Exception as e:
+    except httpx.HTTPError as e:
         raise HTTPException(status_code=500, detail=f"Ошибка ONNX detect: {e}")
 
 
 @app.get("/")
-def root():
+async def root():
     return {"message": "AI Platform backend is running"}
