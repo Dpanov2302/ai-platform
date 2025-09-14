@@ -3,6 +3,7 @@ import {Header} from "../../components/Header";
 import {HomeButton} from "../../components/HomeButton";
 import {Footer} from "../../components/Footer";
 import {Loader} from "lucide-react";
+import {baseUrl} from "@/constants";
 
 const TextGenerationPage = () => {
     const [input, setInput] = useState("");
@@ -17,7 +18,7 @@ const TextGenerationPage = () => {
         setError(null);
 
         try {
-            const response = await fetch("http://localhost:8000/generate-text", {
+            const response = await fetch(`${baseUrl}/generate-text`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

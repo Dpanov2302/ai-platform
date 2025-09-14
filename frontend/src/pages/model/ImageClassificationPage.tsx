@@ -4,6 +4,7 @@ import {HomeButton} from "../../components/HomeButton";
 import {Footer} from "../../components/Footer";
 import {Image as ImageIcon, Loader} from "lucide-react";
 import {Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import {baseUrl} from "@/constants";
 
 
 const ImageClassificationPage = () => {
@@ -44,7 +45,7 @@ const ImageClassificationPage = () => {
         formData.append("file", image);
 
         try {
-            const response = await fetch("http://localhost:8000/classify-image", {
+            const response = await fetch(`${baseUrl}/classify-image`, {
                 method: "POST",
                 body: formData,
             });

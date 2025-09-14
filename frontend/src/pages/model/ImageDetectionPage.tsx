@@ -38,17 +38,17 @@ const ImageDetectionPage = () => {
         formData.append("file", image);
 
         try {
-            const res = await fetch(`${baseUrl}/detect-image`, {
+            const response = await fetch(`${baseUrl}/detect-image`, {
                 method: "POST",
                 body: formData,
             });
 
-            if (res.status === 413) {
+            if (response.status === 413) {
                 throw new Error("Изображение слишком большое. Максимальный размер — 10МБ.");
             }
 
-            if (!res.ok) throw new Error("Ошибка при получении изображения");
-            const blob = await res.blob();
+            if (!response.ok) throw new Error("Ошибка при получении изображения");
+            const blob = await response.blob();
             setImgUrl(URL.createObjectURL(blob));
         } catch (err) {
             if (err instanceof Error) {
