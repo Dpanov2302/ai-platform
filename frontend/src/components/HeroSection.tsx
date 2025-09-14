@@ -1,5 +1,4 @@
 import {ArrowRight} from 'lucide-react';
-import {Header} from './Header';
 
 export const HeroSection = () => {
     const handleTryClick = (e: React.MouseEvent<HTMLAnchorElement>) => {

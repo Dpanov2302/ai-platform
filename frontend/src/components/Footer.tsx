@@ -1,5 +1,5 @@
 import {Github} from 'lucide-react';
-import {TelegramIcon, MireaIcon, MireaEmblem} from '@/components/icons';
+import {MireaEmblem, TelegramIcon} from '@/components/icons';
 import {Link} from 'react-router-dom';
 
 export const Footer = () => {

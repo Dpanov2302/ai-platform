@@ -1,9 +1,9 @@
-import {useState, useEffect} from "react";
+import {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {HomeButton} from "../../components/HomeButton";
 import {Footer} from "../../components/Footer";
-import {Loader, Image as ImageIcon} from "lucide-react";
-import {BarChart, PieChart, Bar, Pie, XAxis, YAxis, Legend, Tooltip, ResponsiveContainer, Cell} from "recharts";
+import {Image as ImageIcon, Loader} from "lucide-react";
+import {Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 
 
 const ImageClassificationPage = () => {
@@ -24,7 +24,6 @@ const ImageClassificationPage = () => {
         const objectUrl = URL.createObjectURL(image);
         setPreviewUrl(objectUrl);
 
-        // Очищаем URL при размонтировании компонента
         return () => URL.revokeObjectURL(objectUrl);
     }, [image]);
 
@@ -112,7 +111,6 @@ const ImageClassificationPage = () => {
                             )}
                         </div>
 
-                        {/* Предпросмотр загруженного изображения */}
                         {previewUrl && (
                             <div className="mt-4 animate-fadeIn">
                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Предпросмотр:</p>

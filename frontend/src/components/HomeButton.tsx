@@ -2,7 +2,7 @@ import {ArrowLeft} from "lucide-react";
 import {Link} from "react-router-dom";
 import {Button} from "./ui/button";
 
-const HomeButton = () => {
+export const HomeButton = () => {
     return (
         <Link to="/">
             <Button
@@ -16,5 +16,3 @@ const HomeButton = () => {
         </Link>
     );
 };
-
-export default HomeButton;

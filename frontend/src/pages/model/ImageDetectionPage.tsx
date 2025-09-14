@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
-import { HomeButton } from "../../components/HomeButton";
+import {HomeButton} from "../../components/HomeButton";
 import {Footer} from "../../components/Footer";
-import {Loader, Image as ImageIcon} from "lucide-react";
+import {Image as ImageIcon, Loader} from "lucide-react";
 import {baseUrl} from "@/constants";
 
 const ImageDetectionPage = () => {
@@ -19,7 +19,6 @@ const ImageDetectionPage = () => {
         const objectUrl = URL.createObjectURL(image);
         setPreviewUrl(objectUrl);
 
-        // Очищаем URL при размонтировании компонента
         return () => URL.revokeObjectURL(objectUrl);
     }, [image]);
 
@@ -53,7 +52,7 @@ const ImageDetectionPage = () => {
             setImgUrl(URL.createObjectURL(blob));
         } catch (err) {
             if (err instanceof Error) {
-                alert(err.message); // или setErrorMessage(err.message)
+                alert(err.message);
             } else {
                 alert("Произошла неизвестная ошибка");
             }
@@ -96,11 +95,11 @@ const ImageDetectionPage = () => {
                             )}
                         </div>
 
-                        {/* Предпросмотр загруженного изображения */}
                         {previewUrl && (
                             <div className="mt-4 animate-fadeIn">
                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Предпросмотр:</p>
-                                <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-2 flex justify-center">
+                                <div
+                                    className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-2 flex justify-center">
                                     <img
                                         src={previewUrl}
                                         alt="Предпросмотр"
@@ -124,7 +123,8 @@ const ImageDetectionPage = () => {
                     {imgUrl && (
                         <div className="mt-8 animate-fadeIn">
                             <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Результат:</h2>
-                            <div className="flex justify-center bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+                            <div
+                                className="flex justify-center bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
                                 <img src={imgUrl} alt="С результатами" className="rounded-md max-h-96 shadow"/>
                             </div>
                         </div>
