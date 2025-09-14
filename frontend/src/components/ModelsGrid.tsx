@@ -14,7 +14,7 @@ const DEMO_MODELS = [
     id: "text-generation",
     title: "Генерация текста",
     description: "Создание текстового контента на основе промпта",
-    tags: ["NLP", "GPT"]
+    tags: ["NLP", "DistilGPT2"]
   },
   {
     id: "image-classification",
@@ -32,19 +32,19 @@ const DEMO_MODELS = [
     id: "sentiment-analysis", 
     title: "Анализ тональности",
     description: "Определение эмоциональной окраски текста",
-    tags: ["NLP", "BERT"]
+    tags: ["Mock", "NLP", "BERT"]
   },
   {
     id: "text-summarization",
     title: "Суммаризация текста",
     description: "Автоматическое создание кратких резюме текстов",  
-    tags: ["NLP", "Transformer"]
+    tags: ["Mock", "NLP", "Transformer"]
   },
   {
     id: "translation",
     title: "Машинный перевод",
     description: "Перевод текстов между различными языками",
-    tags: ["NLP", "Seq2Seq"]
+    tags: ["Mock", "NLP", "Seq2Seq"]
   }
 ];
 

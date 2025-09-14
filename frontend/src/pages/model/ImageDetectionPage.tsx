@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {Header} from "../../components/Header";
-import HomeButton from "../../components/HomeButton";
+import { HomeButton } from "../../components/HomeButton";
 import {Footer} from "../../components/Footer";
 import {Loader, Image as ImageIcon} from "lucide-react";
 import {baseUrl} from "@/constants";
@@ -39,7 +39,7 @@ const ImageDetectionPage = () => {
         formData.append("file", image);
 
         try {
-            const res = await fetch(`${baseUrl}/detect-image-annotated`, {
+            const res = await fetch(`${baseUrl}/detect-image`, {
                 method: "POST",
                 body: formData,
             });

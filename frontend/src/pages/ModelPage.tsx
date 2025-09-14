@@ -1,24 +1,22 @@
-
 import { useParams } from "react-router-dom";
 
-// Импортируем новые шаблоны страниц моделей
-import TextToTextPage from "./model/TextToTextPage";
 import TextToImagePage from "./model/TextToImagePage";
 import ImageToTextPage from "./model/ImageToTextPage";
 import ImageToImagePage from "./model/ImageToImagePage";
 import TextImageToImagePage from "./model/TextImageToImagePage";
 
+import TextGenerationPage from "./model/TextGenerationPage";
 import ImageDetectionPage from "./model/ImageDetectionPage";
 import ImageClassificationPage from "./model/ImageClassificationPage";
 
-// Фолбэк — предыдущая универсальная страница
 import { useState } from 'react';
 import { Header } from '../components/Header';
+import { HomeButton } from "../../components/HomeButton";
 import { Footer } from '../components/Footer';
 import * as React from "react";
 
 const MODEL_TYPE_MAP: Record<string, React.FC> = {
-  "text-text": TextToTextPage,
+  "text-text": TextGenerationPage,
   "text-image": TextToImagePage,
   "image-text": ImageToTextPage,
   "image-image": ImageToImagePage,
@@ -31,13 +29,11 @@ const MODEL_TYPE_MAP: Record<string, React.FC> = {
 const ModelPage = () => {
   const { id } = useParams();
 
-  // Специализированные страницы (варианты моделей)
   if (id && MODEL_TYPE_MAP[id]) {
     const Component = MODEL_TYPE_MAP[id];
     return <Component />;
   }
 
-  // Универсальная "по умолчанию" страница (оставляем старую)
   const [input, setInput] = useState('');
   const [result, setResult] = useState('');
   const [isLoading, setIsLoading] = useState(false);

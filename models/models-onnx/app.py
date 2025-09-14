@@ -37,7 +37,7 @@ async def classify_image(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/detect-image-annotated")
+@app.post("/detect-image")
 async def detect_image(file: UploadFile = File(...)):
     try:
         return await detect.detect_and_annotate(sessions["yolov5"], file)

@@ -35,7 +35,7 @@ ai-platform/
 ├── backend/               # FastAPI backend
 ├── frontend/              # React SPA (Vite + TypeScript)
 ├── models/                # ONNX/Transformers модели в отдельных контейнерах
-├── ndinx.conf             # Реверс-прокси 
+├── nginx.conf             # Реверс-прокси 
 ├── docker-compose.yml     # Инфраструктура проекта
 └── README.md
 ```
@@ -43,31 +43,29 @@ ai-platform/
 ---
 
 ## Быстрый старт
-Клонируйте проект:
+1) Клонируйте проект:
 
 ```bash
 git clone https://github.com/Dpanov2302/ai-platform.git
 cd ai-platform
 ```
 
-Соберите и запустите:
+2) Соберите и запустите:
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
-Откройте интерфейс:
+3) Откройте интерфейс:
 
-```bash
-http://localhost
-```
+> http://localhost
 
 ---
 
 ## Пример взаимодействия
 - Image Detection: загрузка изображение - детекция объектов (YOLOv5n)
 - Image Classification: загрузка изображения — классификация (EfficientNet-lite-4)
-- Text-to-Text: отправка текстового запроса — получение ответа модели (DistilGPT2)
+- Text Generation: отправка текстового запроса — получение ответа модели (DistilGPT2)
 
 ---
 

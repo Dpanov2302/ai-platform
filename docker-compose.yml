@@ -5,11 +5,19 @@ services:
       - "8000:8000"
     depends_on:
       - models-onnx
+      - model-text2text
 
   models-onnx:
     build: ./models/models-onnx
     ports:
       - "8504:8504"
+
+  model-text2text:
+    build: ./models/model-text2text
+    ports:
+      - "8503:8503"
+    volumes:
+      - huggingface_cache:/root/.cache/huggingface
 
   frontend:
     build:

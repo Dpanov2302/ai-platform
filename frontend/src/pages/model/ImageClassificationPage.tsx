@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 import {Header} from "../../components/Header";
-import HomeButton from "../../components/HomeButton";
+import {HomeButton} from "../../components/HomeButton";
 import {Footer} from "../../components/Footer";
 import {Loader, Image as ImageIcon} from "lucide-react";
 import {BarChart, PieChart, Bar, Pie, XAxis, YAxis, Legend, Tooltip, ResponsiveContainer, Cell} from "recharts";

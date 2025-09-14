@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Header } from "../../components/Header";
+import { HomeButton } from "../../components/HomeButton";
 import { Footer } from "../../components/Footer";
 import { Loader } from "lucide-react";
 
-const TextToTextPage = () => {
+const TextGenerationPage = () => {
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +17,7 @@ const TextToTextPage = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:8000/text-to-text", {
+      const response = await fetch("http://localhost:8000/generate-text", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -42,11 +42,16 @@ const TextToTextPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
       <Header />
+      <HomeButton/>
       <main className="max-w-4xl mx-auto px-4 py-24">
-        <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            Модель: Текст → Текст
+        <div
+          className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Генерация текста
           </h1>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-8">
+            Модель: DistilGPT2
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="input-t2t" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -94,4 +99,4 @@ const TextToTextPage = () => {
   );
 };
 
-export default TextToTextPage;
+export default TextGenerationPage;
