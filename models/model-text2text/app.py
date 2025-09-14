@@ -1,7 +1,8 @@
+import logging
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
-import logging
 
 app = FastAPI()
 logger = logging.getLogger("uvicorn.error")
@@ -15,31 +16,41 @@ MODEL_REGISTRY = {
     "falcon-rw-1b": "tiiuae/falcon-rw-1b"
 }
 
+
 # ----- ВХОДНАЯ МОДЕЛЬ -----
 class TextRequest(BaseModel):
     input_text: str
     model_name: str = "distilgpt2"
 
-# ----- ЗАГРУЗКА МОДЕЛЕЙ -----
-@app.on_event("startup")
-def load_models():
-    for name, hf_id in MODEL_REGISTRY.items():
-        try:
-            logger.info(f"Начало загрузки модели '{name}' из {hf_id}...")
 
-            tokenizer = AutoTokenizer.from_pretrained(hf_id)
-            model = AutoModelForCausalLM.from_pretrained(hf_id)
-            pipe = pipeline(
-                "text-generation",
-                model=model,
-                tokenizer=tokenizer,
-                framework="pt",
-                device=-1  # CPU
-            )
-            loaded_pipelines[name] = pipe
-            logger.info(f"Модель '{name}' загружена.")
-        except Exception as e:
-            logger.error(f"Не удалось загрузить модель '{name}': {e}")
+# ----- ЗАГРУЗКА МОДЕЛЕЙ -----
+def get_pipeline(name: str):
+    pipe = loaded_pipelines.get(name)
+    if pipe:
+        return pipe
+
+    hf_id = MODEL_REGISTRY.get(name)
+    if not hf_id:
+        raise HTTPException(status_code=400, detail="Модель не найдена")
+
+    try:
+        logger.info(f"Загрузка модели '{name}' из {hf_id}...")
+        tokenizer = AutoTokenizer.from_pretrained(hf_id)
+        model = AutoModelForCausalLM.from_pretrained(hf_id)
+        pipe = pipeline(
+            "text-generation",
+            model=model,
+            tokenizer=tokenizer,
+            framework="pt",
+            device=-1  # CPU
+        )
+        loaded_pipelines[name] = pipe
+        logger.info(f"Модель '{name}' загружена.")
+        return pipe
+    except Exception as e:
+        logger.error(f"Не удалось загрузить модель '{name}': {e}")
+        raise HTTPException(status_code=500, detail="Ошибка при загрузке модели")
+
 
 # ----- ОБРАБОТКА ЗАПРОСОВ -----
 @app.post("/generate")
@@ -47,9 +58,7 @@ async def generate_text(req: TextRequest):
     if len(req.input_text) > 1000:
         raise HTTPException(status_code=400, detail="Слишком длинный ввод (макс 1000 символов)")
 
-    pipe = loaded_pipelines.get(req.model_name)
-    if not pipe:
-        raise HTTPException(status_code=400, detail="Модель не найдена")
+    pipe = get_pipeline(req.model_name)
 
     prompt = f"User: {req.input_text}\nAI:"
 
