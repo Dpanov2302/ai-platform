@@ -6,11 +6,15 @@ services:
     depends_on:
       - models-onnx
       - model-text2text
+    environment:
+      - ALLOWED_ORIGINS=http://localhost
 
   models-onnx:
     build: ./models/models-onnx
     ports:
       - "8504:8504"
+    environment:
+      - ALLOWED_ORIGINS=http://localhost
 
   model-text2text:
     build: ./models/model-text2text
@@ -18,6 +22,8 @@ services:
       - "8503:8503"
     volumes:
       - huggingface_cache:/root/.cache/huggingface
+    environment:
+      - ALLOWED_ORIGINS=http://localhost
 
   frontend:
     build:

@@ -1,11 +1,28 @@
 import logging
+import os
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 
 app = FastAPI()
 logger = logging.getLogger("uvicorn.error")
+
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS")
+allowed_origins = (
+    [origin.strip() for origin in allowed_origins_env.split(",")]
+    if allowed_origins_env
+    else ["*"]
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Словарь для хранения загруженных пайплайнов
 loaded_pipelines = {}

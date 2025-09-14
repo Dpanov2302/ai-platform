@@ -1,15 +1,24 @@
+import logging
+import os
+
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import logging
 
 from inference import classify, detect
 
 app = FastAPI()
 logger = logging.getLogger("uvicorn.error")
 
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS")
+allowed_origins = (
+    [origin.strip() for origin in allowed_origins_env.split(",")]
+    if allowed_origins_env
+    else ["*"]
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,6 +52,7 @@ def get_session(name: str):
         logger.error(f"Не удалось загрузить модель '{name}': {e}")
         raise HTTPException(status_code=500, detail="Ошибка при загрузке модели")
 
+
 @app.post("/classify")
 async def classify_image(file: UploadFile = File(...)):
     try:
@@ -52,6 +62,7 @@ async def classify_image(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/detect-image")
 async def detect_image(file: UploadFile = File(...)):
     try:
@@ -59,6 +70,7 @@ async def detect_image(file: UploadFile = File(...)):
         return await detect.detect_and_annotate(session, file)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/")
 def root():
