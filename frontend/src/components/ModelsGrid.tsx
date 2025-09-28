@@ -6,7 +6,7 @@ const DEMO_MODELS = [
         id: "text-generation",
         title: "Генерация текста",
         description: "Создание текстового контента на основе промпта",
-        tags: ["NLP", "DistilGPT2"]
+        tags: ["NLP", "Qwen2.5-0.5B-Instruct"]
     },
     {
         id: "image-classification",

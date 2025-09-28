@@ -51,7 +51,7 @@ const TextGenerationPage = () => {
                         Генерация текста
                     </h1>
                     <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-8">
-                        Модель: DistilGPT2
+                        Модель: Qwen2.5-0.5B-Instruct
                     </h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>

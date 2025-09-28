@@ -65,7 +65,7 @@ docker compose up -d --build
 ## Пример взаимодействия
 - Image Detection: загрузка изображение - детекция объектов (YOLOv5n)
 - Image Classification: загрузка изображения — классификация (EfficientNet-lite-4)
-- Text Generation: отправка текстового запроса — получение ответа модели (DistilGPT2)
+- Text Generation: отправка текстового запроса — получение ответа модели (Qwen2.5-0.5B-Instruct)
 
 ---
 

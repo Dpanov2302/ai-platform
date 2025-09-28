@@ -29,15 +29,14 @@ loaded_pipelines = {}
 
 # Допустимые модели и их HuggingFace ID
 MODEL_REGISTRY = {
-    "distilgpt2": "distilbert/distilgpt2",
-    "falcon-rw-1b": "tiiuae/falcon-rw-1b"
+    "qwen2-5_0-5b": "Qwen/Qwen2.5-0.5B-Instruct",
 }
 
 
 # ----- ВХОДНАЯ МОДЕЛЬ -----
 class TextRequest(BaseModel):
     input_text: str
-    model_name: str = "distilgpt2"
+    model_name: str = "qwen2-5_0-5b"
 
 
 # ----- ЗАГРУЗКА МОДЕЛЕЙ -----
@@ -52,8 +51,8 @@ def get_pipeline(name: str):
 
     try:
         logger.info(f"Загрузка модели '{name}' из {hf_id}...")
-        tokenizer = AutoTokenizer.from_pretrained(hf_id)
-        model = AutoModelForCausalLM.from_pretrained(hf_id)
+        tokenizer = AutoTokenizer.from_pretrained(hf_id, trust_remote_code=True, use_fast=True)
+        model = AutoModelForCausalLM.from_pretrained(hf_id, trust_remote_code=True)
         pipe = pipeline(
             "text-generation",
             model=model,
@@ -77,13 +76,13 @@ async def generate_text(req: TextRequest):
 
     pipe = get_pipeline(req.model_name)
 
-    prompt = f"User: {req.input_text}\nAI:"
+    prompt = pipe.tokenizer.apply_chat_template([{"role":"user","content": req.input_text}], add_generation_prompt=True, tokenize=False) if hasattr(pipe.tokenizer, "apply_chat_template") else f"User: {req.input_text}\nAI:"
 
     try:
         pad_token_id = pipe.tokenizer.pad_token_id or pipe.tokenizer.eos_token_id
         result = pipe(
             prompt,
-            max_new_tokens=100,
+            max_new_tokens=150,
             do_sample=True,
             temperature=0.8,
             top_k=50,

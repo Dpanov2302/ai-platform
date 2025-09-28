@@ -29,7 +29,6 @@ env/
 
 # ===== Env files =====
 .env
-# .env.*  # Рекомендуется не включать, вместо этого дать пример в env.example
 !env.example
 
 # ===== Docker =====
